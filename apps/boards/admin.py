@@ -1,16 +1,16 @@
 from django.contrib import admin
-from .models import Board, BoardMembership, Column 
+from .models import Board, Column 
 
 # Register your models here.
 @admin.register(Board)
 class BoardAdmin(admin.ModelAdmin):
-    list_display = ['title', 'owner', 'created_at']
+    list_display = ['title']
     search_fields = ['title']
 
 
-@admin.register(BoardMembership)
-class BoardMembershipAdmin(admin.ModelAdmin):
-    list_display = ['user', 'board', 'role', 'joined_at']
+#@admin.register(BoardMembership)
+#class BoardMembershipAdmin(admin.ModelAdmin):
+#    list_display = ['user', 'board', 'role', 'joined_at']
 
 
 @admin.register(Column)

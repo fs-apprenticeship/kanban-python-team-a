@@ -16,13 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from apps.boards import views as board_views
+from apps.cards import views as card_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('apps.boards.urls')),
+    path('', board_views.board, name='board'), 
+    path('cards/create/', card_views.card_create, name='card-create'),
+    path('cards/<int:card_id>/', card_views.card_detail, name='card-detail'),
+    path('cards/<int:card_id>/assign/', card_views.card_assign, name='card-assign'),
+    path('cards/<int:card_id>/unassign/', card_views.card_unassign, name='card-unassign'),
+    path('cards/<int:card_id>/delete/', card_views.card_delete, name='card-delete'),
+]
+    #path('', include('apps.boards.urls')),
     #path('', include('apps.cards.urls')),
     # path('boards/', include('apps.boards.urls')),
-    path('users/', include('apps.users.urls')),
-    path('cards/', include('apps.cards.urls')),
+    #path('users/', include('apps.users.urls')),
+    #path('cards/', include('apps.cards.urls')),
 
-]
+

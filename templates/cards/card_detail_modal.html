@@ -296,26 +296,7 @@
         if (e.key === 'Escape') closeModal();
     });
 </script>
-```
 
----
-
-**The Flow Now**
-```
-Click card
-    → modal opens showing task details
-    → dropdown shows all unassigned users
-
-Select a name and click Assign
-    → HTMX posts to /cards/1/assign/
-    → Django adds that user to assignees
-    → modal refreshes showing the new assignee
-    → dropdown updates removing that person
-
-Click ✕ next to an assignee
-    → HTMX posts to /cards/1/unassign/
-    → Django removes them
-    → modal refreshes
        
    
        

@@ -2,9 +2,35 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Card
 from apps.users.models import User
-
+from apps.boards.models import Column 
 
 # Create your views here.
+def card_create(request):
+    column_id = request.GET.get('column_id') or request.POST.get('column_id')
+    column = get_object_or_404(Column, id=column_id)
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+
+        if title:
+            Card.objects.create(
+                title=title,
+                description=description,
+                column=column,
+            )
+
+        # Return updated card list for this column
+        return render(request, 'partials/column_cards.html', {
+            'column': column,
+            'is_done': column.title.lower() == 'done',
+        })
+
+    # GET — return the create form
+    return render(request, 'partials/card_create_form.html', {
+        'column': column,
+    })
+
 def card_detail(request, card_id):
     card = get_object_or_404(Card, id=card_id)
     users = User.objects.all()

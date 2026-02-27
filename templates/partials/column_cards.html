@@ -1,0 +1,24 @@
+{% for card in column.cards.all %}
+    <div class="card {% if is_done %}card-done{% endif %}"
+         hx-get="/cards/{{ card.id }}/"
+         hx-target="#modal-container"
+         hx-trigger="click">
+        <div class="card-title">{{ card.title }}</div>
+        <div class="card-assigned">
+            {% if card.assignees.all %}
+                Assigned to:
+                {% for a in card.assignees.all %}
+                    {{ a.username }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            {% else %}
+                Unassigned
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <div style="color:#aaa; font-size:0.85rem; padding:0.5rem;">
+        No tasks yet
+    </div>
+{% endfor %}
+
+

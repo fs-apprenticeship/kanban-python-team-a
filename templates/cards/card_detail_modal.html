@@ -1,0 +1,304 @@
+<div class="modal-overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+
+        <div class="modal-header">
+            <div class="modal-header-bar"></div>
+            <div class="modal-header-actions">
+                <button
+                    hx-get="/cards/{{ card.id }}/edit/"
+                    hx-target="#modal-container"
+                    class="btn-edit">
+                    Edit
+                </button>
+                <button onclick="closeModal()" class="btn-close">✕</button>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <h2 class="modal-title">{{ card.title }}</h2>
+
+            <p class="modal-description">
+                {{ card.description|default:"No description provided." }}
+            </p>
+
+            <!-- Current assignees -->
+            <div class="field-group">
+                <label>Assigned to</label>
+                {% if card.assignees.all %}
+                    <div class="assignees-list">
+                        {% for assignee in card.assignees.all %}
+                            <div class="assignee-row">
+                                <div class="assignee-badge">
+                                    {{ assignee.username|first|upper }}
+                                </div>
+                                <span>{{ assignee.username }}</span>
+                                <!-- Remove assignee -->
+                                <button
+                                    hx-post="/cards/{{ card.id }}/unassign/"
+                                    hx-target="#modal-container"
+                                    hx-vals='{"user_id": "{{ assignee.id }}"}'
+                                    class="btn-remove"
+                                    title="Remove assignee">
+                                    ✕
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty">No one assigned yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Assign a user -->
+            <div class="field-group">
+                <label>Assign someone</label>
+                <form
+                    hx-post="/cards/{{ card.id }}/assign/"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <div class="assign-row">
+                        <select name="user_id" class="input">
+                            <option value="">Select a person...</option>
+                            {% for user in users %}
+                                {% if user not in card.assignees.all %}
+                                    <option value="{{ user.id }}">
+                                        {{ user.username }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-primary">
+                            Assign
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Status and dates -->
+            <div class="modal-meta">
+                <span class="status-badge status-{{ card.status }}">
+                    {{ card.get_status_display }}
+                </span>
+                {% if card.due_date %}
+                    <span>Due {{ card.due_date|date:"M d, Y" }}</span>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
+
+    .modal {
+        background: white;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        background: #80cbc4;
+        padding: 0.75rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header-bar {
+        width: 60px;
+        height: 4px;
+        background: rgba(0,0,0,0.15);
+        border-radius: 2px;
+    }
+
+    .modal-header-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .btn-edit {
+        background: rgba(0,0,0,0.1);
+        border: none;
+        padding: 0.3rem 0.75rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    .btn-edit:hover {
+        background: rgba(0,0,0,0.2);
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .modal-body {
+        padding: 1.75rem;
+    }
+
+    .modal-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .modal-description {
+        color: #555;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .field-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .field-group label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #888;
+        margin-bottom: 0.5rem;
+    }
+
+    .assignees-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .assignee-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .assignee-badge {
+        background: #1565c0;
+        color: white;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .btn-remove {
+        background: none;
+        border: none;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 0.8rem;
+        margin-left: auto;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+    }
+
+    .btn-remove:hover {
+        background: #fee;
+        color: #cc0000;
+    }
+
+    .assign-row {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+    }
+
+    .input:focus {
+        outline: none;
+        border-color: #1565c0;
+        box-shadow: 0 0 0 2px rgba(21,101,192,0.2);
+    }
+
+    .btn-primary {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+        background: #1565c0;
+    }
+
+    .modal-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .status-badge {
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-todo { background: #e3e3e3; color: #555; }
+    .status-in_progress { background: #deebff; color: #0052cc; }
+    .status-in_review { background: #fff4e5; color: #d17000; }
+    .status-done { background: #e3fcef; color: #006644; }
+
+    .empty {
+        color: #aaa;
+        font-size: 0.9rem;
+    }
+</style>
+
+<script>
+    function closeModal() {
+        document.getElementById('modal-container').innerHTML = '';
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+</script>
+
+       
+   
+       
+
+   

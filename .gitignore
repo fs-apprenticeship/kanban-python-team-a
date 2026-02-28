@@ -6,6 +6,7 @@ __pycache__/
 *.swp
 
 # Virtual environment
+.env
 venv/
 ENV/
 env/

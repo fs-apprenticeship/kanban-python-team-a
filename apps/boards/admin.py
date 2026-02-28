@@ -1,0 +1,16 @@
+from django.contrib import admin
+from .models import Board, Column 
+
+# Register your models here.
+@admin.register(Board)
+class BoardAdmin(admin.ModelAdmin):
+    list_display = ['title']
+    search_fields = ['title']
+
+
+
+
+@admin.register(Column)
+class ColumnAdmin(admin.ModelAdmin):
+    list_display = ['title', 'board', 'position']
+    ordering = ['board', 'position']

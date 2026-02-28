@@ -22,3 +22,6 @@ env/
 *.mo
 staticfiles/
 media/
+
+.env 
+*.env

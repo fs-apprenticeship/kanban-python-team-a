@@ -20,7 +20,7 @@ def card_create(request):
                 column=column,
             )
 
-        # Return updated card list for this column
+        
         return render(request, 'partials/column_cards.html', {
             'column': column,
             'is_done': column.title.lower() == 'done',
@@ -47,24 +47,6 @@ def card_edit(request, card_id):
         'card': card,
         'users': users,
     })
-def card_update(request, card_id):
-    card = get_object_or_404(Card, id=card_id)
-
-    if request.method == 'POST':
-        card.title = request.POST.get('title', card.title)
-        card.description = request.POST.get('description', card.description)
-        card.status = request.POST.get('status', card.status)
-
-        # Handle assignees — getlist because multiple can be selected
-        assignee_ids = request.POST.getlist('assignees')
-        card.assignees.set(assignee_ids)
-
-        card.save()
-
-    return render(request, 'cards/card_detail_modal.html', {
-        'card': card,
-        'users': User.objects.all(),
-        })
 
 def card_delete(request, card_id):
     card = get_object_or_404(Card, id=card_id)

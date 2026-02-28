@@ -28,10 +28,4 @@ urlpatterns = [
     path('cards/<int:card_id>/unassign/', card_views.card_unassign, name='card-unassign'),
     path('cards/<int:card_id>/delete/', card_views.card_delete, name='card-delete'),
 ]
-    #path('', include('apps.boards.urls')),
-    #path('', include('apps.cards.urls')),
-    # path('boards/', include('apps.boards.urls')),
-    #path('users/', include('apps.users.urls')),
-    #path('cards/', include('apps.cards.urls')),
-
-
+    

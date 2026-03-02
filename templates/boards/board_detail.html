@@ -1,5 +1,8 @@
-{% extends 'base.html' %} {% block title %}{{ board.title }}{% endblock %} {%
-block extra_styles %}
+{% extends 'base.html' %}
+{% block title %}
+{{ board.title }}
+{% endblock %}
+{% block extra_styles %}
 <style>
   body {
     background: #f0f0f0;
@@ -94,7 +97,9 @@ block extra_styles %}
     color: #333;
   }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+{# splitter #}
+{% block content %}
 
 <div class="board-banner">{{ board.title }}</div>
 
@@ -115,9 +120,15 @@ block extra_styles %}
       >
         <div class="card-title">{{ card.title }}</div>
         <div class="card-assigned">
-          {% if card.assignees.all %} Assigned to: {% for a in
-          card.assignees.all %} {{ a.username }}{% if not forloop.last %}, {%
-          endif %} {% endfor %} {% else %} Unassigned {% endif %}
+          {# splitter #}
+          {% if card.assignees.all %}
+            Assigned to:
+            {% for a in card.assignees.all %}
+              {{ a.username }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          {% else %}
+            Unassigned
+          {% endif %}
         </div>
       </div>
       {% empty %}
@@ -150,7 +161,9 @@ block extra_styles %}
 
 <div id="modal-container"></div>
 
-{% endblock %} {% block extra_scripts %}
+{% endblock %}
+{# splitter #}
+{% block extra_scripts %}
 <script>
   function closeModal() {
     document.getElementById("modal-container").innerHTML = "";

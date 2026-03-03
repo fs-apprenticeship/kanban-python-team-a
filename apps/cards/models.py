@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 from apps.boards.models import Column
 
-# Create your models here.
+# represents task card that's within a Board Column
+# tracks title, description, status, column placement, and assigned users.
 class Card(models.Model):
 
     class Status(models.TextChoices):
@@ -18,9 +19,7 @@ class Card(models.Model):
         choices=Status.choices,
         default=Status.NOT_STARTED
     )
-   
-    
- 
+
     column = models.ForeignKey(
         Column,
         on_delete=models.CASCADE,
@@ -31,7 +30,7 @@ class Card(models.Model):
         blank=True,
         related_name='assigned_cards'
     )
-   
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:

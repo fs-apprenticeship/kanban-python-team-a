@@ -8,9 +8,14 @@
 >
   <div class="card-title">{{ card.title }}</div>
   <div class="card-assigned">
-    {% if card.assignees.all %} Assigned to: {% for a in card.assignees.all %}
-    {{ a.username }}{% if not forloop.last %}, {% endif %} {% endfor %} {% else
-    %} Unassigned {% endif %}
+    {% if card.assignees.all %}
+      Assigned to: 
+      {% for a in card.assignees.all %}
+        {{ a.username }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    {% else%}
+      Unassigned
+    {% endif %}
   </div>
 </div>
 {% empty %}

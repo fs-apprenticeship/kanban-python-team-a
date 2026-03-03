@@ -80,7 +80,10 @@ def card_delete(request, card_id):
         # clear modal container after deletion
         # return small JS response to clear modal after deletion
         return HttpResponse(
-            '<script>document.getElementById("modal-container").innerHTML=""</script>'
+            '<script>'
+            'document.getElementById("modal-container").innerHTML="";'
+            'var el = document.getElementById("card-%s"); if(el) el.remove();'
+            '</script>' % card_id
         )
     
     # GET request — show confirmation modal

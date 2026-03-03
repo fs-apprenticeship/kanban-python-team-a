@@ -53,9 +53,12 @@ def card_delete(request, card_id):
 
     if request.method == 'DELETE':
         card.delete()
-        # Clear the modal container after deletion
+        # clear the modal and remove the card element on the board
         return HttpResponse(
-            '<script>document.getElementById("modal-container").innerHTML=""</script>'
+            '<script>'
+            'document.getElementById("modal-container").innerHTML="";'
+            'var el = document.getElementById("card-%s"); if(el) el.remove();'
+            '</script>' % card_id
         )
 
     # GET request — show confirmation modal

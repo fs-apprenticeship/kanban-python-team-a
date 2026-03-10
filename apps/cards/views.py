@@ -75,15 +75,34 @@ def card_edit(request, card_id):
             card.description = description
             if status in dict(Card.Status.choices):
                 card.status = status
+
+                # if we know how to map this status to a column title, try to relocate
+                status_map = {
+                    Card.Status.NOT_STARTED: 'To Do',
+                    Card.Status.IN_PROGRESS: 'In Progress',
+                    Card.Status.COMPLETE: 'Done',
+                    Card.Status.OVERDUE: 'To Do',
+                }
+                target_title = status_map.get(status)
+                if target_title:
+                    try:
+                        new_col = card.column.board.columns.get(title=target_title)
+                        card.column = new_col
+                    except Exception:
+                        pass
             card.save()
 
         # after saving, re‑render the detail view so user sees changes
         # include script to update the card title (and done status class) in the board
-        # build a small script that updates the task's tile and done class
+        # and move the card element into the appropriate column container
+        target_col_id = card.column.id
         script = (
             "var el = document.querySelector('#card-%s');" % card.id +
             "if(el){ el.querySelector('.card-title').textContent = %r;" % card.title +
-            " if(%r === 'complete'){ el.classList.add('card-done'); } else { el.classList.remove('card-done'); } }" % card.status
+            " var target = document.querySelector('#column-cards-%s');" % target_col_id +
+            " if(target && el.parentNode !== target){ target.appendChild(el); }" +
+            " if(%r === 'complete'){ el.classList.add('card-done'); }" % card.status +
+            " else { el.classList.remove('card-done'); } }"
         )
         return render(request, 'cards/card_detail_modal.html', {
             'card': card,

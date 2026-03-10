@@ -26,6 +26,7 @@ urlpatterns = [
     path('cards/<int:card_id>/', card_views.card_detail, name='card-detail'),
     path('cards/<int:card_id>/assign/', card_views.card_assign, name='card-assign'),
     path('cards/<int:card_id>/unassign/', card_views.card_unassign, name='card-unassign'),
+    path('cards/<int:card_id>/edit/', card_views.card_edit, name='card-edit'),
     path('cards/<int:card_id>/delete/', card_views.card_delete, name='card-delete'),
 ]
     

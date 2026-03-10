@@ -98,11 +98,25 @@ def card_edit(request, card_id):
         target_col_id = card.column.id
         script = (
             "var el = document.querySelector('#card-%s');" % card.id +
-            "if(el){ el.querySelector('.card-title').textContent = %r;" % card.title +
+            "if(el){" +
+            " el.querySelector('.card-title').textContent = %r;" % card.title +
+            " var sourceParent = el.parentNode;" +
             " var target = document.querySelector('#column-cards-%s');" % target_col_id +
-            " if(target && el.parentNode !== target){ target.appendChild(el); }" +
+            " if(target && el.parentNode !== target){" +
+            "  target.querySelectorAll('div').forEach(function(d){ if(d.id === '' && d.textContent.includes('No tasks yet')){ d.remove(); }});" +
+            "  target.appendChild(el);" +
+            "  if(sourceParent && sourceParent.querySelectorAll('[id^=\"card-\"]').length === 0){" +
+            "    var emptyMsg = document.createElement('div');" +
+            "    emptyMsg.style.color = '#aaa';" +
+            "    emptyMsg.style.fontSize = '0.85rem';" +
+            "    emptyMsg.style.padding = '0.5rem';" +
+            "    emptyMsg.textContent = 'No tasks yet';" +
+            "    sourceParent.appendChild(emptyMsg);" +
+            "  }" +
+            " }" +
             " if(%r === 'complete'){ el.classList.add('card-done'); }" % card.status +
-            " else { el.classList.remove('card-done'); } }"
+            " else { el.classList.remove('card-done'); }" +
+            "}"
         )
         return render(request, 'cards/card_detail_modal.html', {
             'card': card,
@@ -123,14 +137,32 @@ def card_delete(request, card_id):
 
     # if method == DELETE, remove card from db
     if request.method == 'DELETE':
+        col_id = card.column.id
         card.delete()
-        # clear modal container after deletion
-        # return small JS response to clear modal after deletion
+        # After deletion, check if column has any remaining cards
+        remaining_cards = Card.objects.filter(column_id=col_id).count()
+        
+        script = (
+            'document.getElementById("modal-container").innerHTML="";' +
+            'var el = document.getElementById("card-%s"); if(el) el.remove();' % card_id
+        )
+        
+        # if column is now empty, add the "No tasks yet" message
+        if remaining_cards == 0:
+            script += (
+                'var colContainer = document.querySelector("#column-cards-%s");' % col_id +
+                'if(colContainer){' +
+                '  var emptyMsg = document.createElement("div");' +
+                '  emptyMsg.style.color = "#aaa";' +
+                '  emptyMsg.style.fontSize = "0.85rem";' +
+                '  emptyMsg.style.padding = "0.5rem";' +
+                '  emptyMsg.textContent = "No tasks yet";' +
+                '  colContainer.appendChild(emptyMsg);' +
+                '}'
+            )
+        
         return HttpResponse(
-            '<script>'
-            'document.getElementById("modal-container").innerHTML="";'
-            'var el = document.getElementById("card-%s"); if(el) el.remove();'
-            '</script>' % card_id
+            '<script>%s</script>' % script
         )
     
     # GET request — show confirmation modal

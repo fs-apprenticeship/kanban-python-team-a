@@ -60,10 +60,38 @@ def card_edit(request, card_id):
     # retrieve card from db with id
     card = get_object_or_404(Card, id=card_id)
 
-    # get all users
+    # load anything the template might need (users for assignment list)
     users = User.objects.all()
 
-    # render edit modal w/ card & user data
+    # POST indicates form submission to update the card
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        status = request.POST.get('status')
+
+        # require at least a title to avoid blanking out
+        if title:
+            card.title = title
+            card.description = description
+            if status in dict(Card.Status.choices):
+                card.status = status
+            card.save()
+
+        # after saving, re‑render the detail view so user sees changes
+        # include script to update the card title (and done status class) in the board
+        # build a small script that updates the task's tile and done class
+        script = (
+            "var el = document.querySelector('#card-%s');" % card.id +
+            "if(el){ el.querySelector('.card-title').textContent = %r;" % card.title +
+            " if(%r === 'complete'){ el.classList.add('card-done'); } else { el.classList.remove('card-done'); } }" % card.status
+        )
+        return render(request, 'cards/card_detail_modal.html', {
+            'card': card,
+            'users': users,
+            'extra_script': script,
+        })
+
+    # GET request — render the edit form modal
     return render(request, 'cards/card_edit_modal.html', {
         'card': card,
         'users': users,

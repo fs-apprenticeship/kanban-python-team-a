@@ -4,9 +4,9 @@ from apps.users.models import User
 
 # Create your views here.
 def board(request):
-    board = Board.objects.first()
+    board = Board.objects.first()                           # grabs first board in the DB
     if not board:
-        return render(request, 'boards/no_board.html')
+        return render(request, 'boards/no_board.html')     # currently supports 1 active board at a time
 
     # Get columns in fixed order by title
     todo = board.columns.filter(title='To Do').first()

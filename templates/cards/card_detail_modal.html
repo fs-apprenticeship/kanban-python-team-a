@@ -79,18 +79,25 @@
         </form>
       </div>
 
-      <!-- Status and dates -->
+      <!-- Status -->
       <div class="modal-meta">
         <span class="status-badge status-{{ card.status }}">
           {{ card.get_status_display }}
         </span>
-        {% if card.due_date %}
-        <span>Due {{ card.due_date|date:"M d, Y" }}</span>
-        {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+{% if extra_script %}
+<script>
+  {
+    {
+      extra_script | safe;
+    }
+  }
+</script>
+{% endif %}
 
 <style>
   .modal-overlay {
